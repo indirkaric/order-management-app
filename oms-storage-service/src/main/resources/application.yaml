@@ -1,0 +1,52 @@
+server:
+  port: 8085  # Application server port
+
+springdoc:
+  swagger-ui:
+    doc-expansion: none  # Swagger UI: Controls the initial expansion of the documentation
+    operations-sorter: alpha  # Sort API operations alphabetically
+    tags-sorter: alpha  # Sort API tags alphabetically
+
+spring:
+  application:
+    name: oms-storage-service
+
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: "http://auth.oms.local:8080/realms/order-management"  # OAuth2 issuer URI
+
+  servlet:
+    multipart:
+      enabled: true  # Enable file upload support
+      file-size-threshold: 2MB  # The threshold after which file data is written to disk
+      max-file-size: 200MB  # Maximum single file size for upload
+      max-request-size: 300MB  # Maximum total request size for multipart uploads
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health  # Expose only the health endpoint
+
+environment: DEV # Define the environment (DEV/PROD/etc.)
+
+cloud:
+  aws:
+    credentials:
+      # only for development
+      access-key: testUser
+      secret-key: testAccessKey
+      s3:
+        # LocalStack alias declared by development/docker-compose.yml
+        endpoint: aws.oms.local:4566
+    region:
+      static: eu-west-2
+    stack:
+      auto: false
+
+application:
+  bucket:
+    name: oms-product-files
+  cloud-provider: "AWS"

@@ -1,0 +1,229 @@
+{
+  "realm": "order-management",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "roles": {
+    "realm": [
+      { "name": "ORDER_READ", "description": "Pregled narudzbi", "composite": false, "clientRole": false },
+      { "name": "ORDER_WRITE", "description": "Kreiranje i izmjena narudzbi", "composite": false, "clientRole": false },
+      { "name": "ORDER_DELETE", "description": "Brisanje narudzbi", "composite": false, "clientRole": false },
+      { "name": "USER_READ", "description": "Pregled korisnika", "composite": false, "clientRole": false },
+      { "name": "USER_MANAGE", "description": "Kreiranje, izmjena, brisanje korisnika i dodjela grupa", "composite": false, "clientRole": false },
+      { "name": "AUDIT_READ", "description": "Pregled audit logova", "composite": false, "clientRole": false },
+      { "name": "PRODUCT_READ", "description": "Pregled proizvoda i njihovih dokumenata", "composite": false, "clientRole": false },
+      { "name": "PRODUCT_WRITE", "description": "Kreiranje proizvoda i upload dokumentacije", "composite": false, "clientRole": false }
+    ]
+  },
+  "groups": [
+    {
+      "name": "OMS_ADMIN",
+      "path": "/OMS_ADMIN",
+      "attributes": {},
+      "realmRoles": ["ORDER_READ", "ORDER_WRITE", "ORDER_DELETE", "USER_READ", "USER_MANAGE", "AUDIT_READ", "PRODUCT_READ", "PRODUCT_WRITE"],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "name": "OMS_MANAGER",
+      "path": "/OMS_MANAGER",
+      "attributes": {},
+      "realmRoles": ["ORDER_READ", "ORDER_WRITE", "ORDER_DELETE", "USER_READ", "PRODUCT_READ", "PRODUCT_WRITE"],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "name": "OMS_CUSTOMER",
+      "path": "/OMS_CUSTOMER",
+      "attributes": {},
+      "realmRoles": ["ORDER_READ", "ORDER_WRITE", "PRODUCT_READ"],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "name": "OMS_AUDITOR",
+      "path": "/OMS_AUDITOR",
+      "attributes": {},
+      "realmRoles": ["AUDIT_READ", "ORDER_READ", "USER_READ", "PRODUCT_READ"],
+      "clientRoles": {},
+      "subGroups": []
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "Admin",
+      "email": "admin@oms.local",
+      "attributes": { "user_id": ["OMSADM01"] },
+      "credentials": [{ "type": "password", "value": "admin", "temporary": false }],
+      "groups": ["/OMS_ADMIN"]
+    },
+    {
+      "username": "manager.oms",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Manager",
+      "lastName": "Oms",
+      "email": "manager.oms@oms.local",
+      "attributes": { "user_id": ["OMSMGR01"] },
+      "credentials": [{ "type": "password", "value": "manager.oms", "temporary": false }],
+      "groups": ["/OMS_MANAGER"]
+    },
+    {
+      "username": "customer.oms",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Customer",
+      "lastName": "Oms",
+      "email": "customer.oms@oms.local",
+      "attributes": { "user_id": ["OMSCUST01"] },
+      "credentials": [{ "type": "password", "value": "customer.oms", "temporary": false }],
+      "groups": ["/OMS_CUSTOMER"]
+    },
+    {
+      "username": "auditor.oms",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Auditor",
+      "lastName": "Oms",
+      "email": "auditor.oms@oms.local",
+      "attributes": { "user_id": ["OMSAUD01"] },
+      "credentials": [{ "type": "password", "value": "auditor.oms", "temporary": false }],
+      "groups": ["/OMS_AUDITOR"]
+    },
+    {
+      "username": "service-account-oms-identity-service",
+      "enabled": true,
+      "serviceAccountClientId": "oms-identity-service",
+      "clientRoles": {
+        "realm-management": ["manage-users", "view-users", "query-groups"]
+      }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "oms-app",
+      "name": "OMS Frontend / Postman client",
+      "publicClient": true,
+      "bearerOnly": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": true,
+      "protocol": "openid-connect",
+      "redirectUris": ["*"],
+      "defaultClientScopes": [
+        "ORDER_READ", "ORDER_WRITE", "ORDER_DELETE", "USER_READ", "USER_MANAGE",
+        "AUDIT_READ", "PRODUCT_READ", "PRODUCT_WRITE", "profile", "email"
+      ],
+      "optionalClientScopes": ["offline_access", "roles"],
+      "protocolMappers": [
+        {
+          "name": "user_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "user_id",
+            "claim.name": "user_id",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "oms-identity-service",
+      "name": "identity-service resource server",
+      "publicClient": false,
+      "bearerOnly": true,
+      "serviceAccountsEnabled": true,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "oms-order-service",
+      "name": "order-service resource server",
+      "publicClient": false,
+      "bearerOnly": true,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "oms-audit-log-service",
+      "name": "audit-log-service resource server",
+      "publicClient": false,
+      "bearerOnly": true,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "oms-ui-service",
+      "name": "oms-ui-service gateway resource server",
+      "publicClient": false,
+      "bearerOnly": true,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "oms-storage-service",
+      "name": "oms-storage-service resource server",
+      "publicClient": false,
+      "bearerOnly": true,
+      "protocol": "openid-connect"
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "ORDER_READ",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true", "display.on.consent.screen": "false" }
+    },
+    {
+      "name": "ORDER_WRITE",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true", "display.on.consent.screen": "false" }
+    },
+    {
+      "name": "ORDER_DELETE",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true", "display.on.consent.screen": "false" }
+    },
+    {
+      "name": "USER_READ",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true", "display.on.consent.screen": "false" }
+    },
+    {
+      "name": "USER_MANAGE",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true", "display.on.consent.screen": "false" }
+    },
+    {
+      "name": "AUDIT_READ",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true", "display.on.consent.screen": "false" }
+    },
+    {
+      "name": "PRODUCT_READ",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true", "display.on.consent.screen": "false" }
+    },
+    {
+      "name": "PRODUCT_WRITE",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true", "display.on.consent.screen": "false" }
+    }
+  ],
+  "scopeMappings": [
+    { "clientScope": "ORDER_READ", "roles": ["ORDER_READ"] },
+    { "clientScope": "ORDER_WRITE", "roles": ["ORDER_WRITE"] },
+    { "clientScope": "ORDER_DELETE", "roles": ["ORDER_DELETE"] },
+    { "clientScope": "USER_READ", "roles": ["USER_READ"] },
+    { "clientScope": "USER_MANAGE", "roles": ["USER_MANAGE"] },
+    { "clientScope": "AUDIT_READ", "roles": ["AUDIT_READ"] },
+    { "clientScope": "PRODUCT_READ", "roles": ["PRODUCT_READ"] },
+    { "clientScope": "PRODUCT_WRITE", "roles": ["PRODUCT_WRITE"] }
+  ]
+}

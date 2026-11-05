@@ -1,0 +1,48 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: audit-log-service
+
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://auth.oms.local:8080/realms/order-management
+
+  elasticsearch:
+    uris: http://elasticsearch.oms.local:9200
+
+  kafka:
+    bootstrap-servers: kafka.oms.local:9092
+    consumer:
+      group-id: audit-log-service
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: com.sqa.oms.common.events
+        spring.json.value.default.type: com.sqa.oms.common.events.OmsEvent
+    listener:
+      ack-mode: record
+
+springdoc:
+  swagger-ui:
+    doc-expansion: none
+    operationsSorter: alpha
+    tagsSorter: alpha
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+oms:
+  kafka:
+    topic:
+      audit-events: oms.audit.events

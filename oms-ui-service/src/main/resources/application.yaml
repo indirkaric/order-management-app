@@ -1,0 +1,37 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: oms-ui-service
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://auth.oms.local:8080/realms/order-management
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 300MB
+
+client:
+  order:
+    base-uri: http://order.oms.local:8082/api/v1/
+  identity:
+    base-uri: http://identity.oms.local:8081/api/v1/
+  audit-log:
+    base-uri: http://audit-log.oms.local:8083/api/v1/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.sqa.oms.ui: INFO

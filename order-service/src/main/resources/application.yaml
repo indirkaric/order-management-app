@@ -1,0 +1,72 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: order-service
+
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://auth.oms.local:8080/realms/order-management
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        default_schema: order_management
+
+  liquibase:
+    enabled: true
+    change-log: classpath:/liquibase/changelog.xml
+    # contexts property has to be overridden in production with the value pro
+    contexts: dev,test
+
+  kafka:
+    bootstrap-servers: kafka.oms.local:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2MB
+      max-file-size: 200MB
+      max-request-size: 200MB
+
+database:
+  # Both pairs point at the same instance for now; split them into a real
+  # read replica later without touching any code once one becomes available.
+  readwrite:
+    url: jdbc:postgresql://database.oms.local:5432/order_db
+    username: order_app
+    password: order_app
+  readonly:
+    url: jdbc:postgresql://database.oms.local:5432/order_db
+    username: order_app
+    password: order_app
+
+client:
+  storage:
+    base-uri: "http://storage.oms.local:8085/api/v1/"
+
+springdoc:
+  swagger-ui:
+    doc-expansion: none
+    operationsSorter: alpha
+    tagsSorter: alpha
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+oms:
+  kafka:
+    topic:
+      audit-events: oms.audit.events
