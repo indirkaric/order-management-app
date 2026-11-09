@@ -33,7 +33,7 @@ import java.util.Optional;
  * Criteria API based access to the orders table.
  */
 @Repository
-public class OrderRepository implements IOrderRepository {
+public final class OrderRepository implements IOrderRepository {
 
     // Field injection: EntityManager is a container-managed persistence context proxy,
     // not a plain singleton bean, so it is wired through @PersistenceContext rather than the constructor.

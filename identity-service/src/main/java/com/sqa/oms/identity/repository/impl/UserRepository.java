@@ -37,7 +37,7 @@ import java.util.Optional;
  * Criteria API based access to the user table.
  */
 @Repository
-public class UserRepository implements IUserRepository {
+public final class UserRepository implements IUserRepository {
 
     // Constructor injection: EntityManager is still a container-managed persistence context proxy,
     // but it is a regular injectable bean for this service's single persistence unit, so it is wired

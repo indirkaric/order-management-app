@@ -89,6 +89,12 @@ public class CreateUserService implements ICreateUserService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Creates a user from the given request.
+     *
+     * @param request the user to create
+     * @return entityId of the created user
+     */
     @Override
     public String save(final CreateUserRequest request) {
         Check.isNotNull(request, "request");

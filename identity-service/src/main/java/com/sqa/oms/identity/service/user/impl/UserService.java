@@ -45,6 +45,12 @@ public class UserService implements IUserService {
         this.userMapper = userMapper;
     }
 
+    /**
+     * Reads a single user by its entityId.
+     *
+     * @param entityId entityId of the user
+     * @return the user
+     */
     @Override
     public UserDTO getByEntityId(final String entityId) {
         Check.isNotEmpty(entityId, "entityId");
@@ -58,6 +64,13 @@ public class UserService implements IUserService {
         return userMapper.toDto(projection);
     }
 
+    /**
+     * Reads a page of users matching the given filter.
+     *
+     * @param request  filter criteria
+     * @param pageable paging and sorting
+     * @return the matching page of users
+     */
     @Override
     public PagedList<UserDTO> getPagedList(final UserListRequest request, final Pageable pageable) {
         Check.isNotNull(request, "request");

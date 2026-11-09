@@ -18,7 +18,7 @@ import java.util.List;
  * Default implementation of the product list response builder.
  */
 @Service
-public class ProductListResponseCreatorService implements IProductListResponseCreatorService {
+public final class ProductListResponseCreatorService implements IProductListResponseCreatorService {
 
     private final IProductService productService;
 

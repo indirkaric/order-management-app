@@ -16,7 +16,7 @@ import java.util.Optional;
  * Default implementation of the user update validation.
  */
 @Service
-public class ModifyUserServiceValidator extends BaseUserDataValidator implements IModifyUserServiceValidator {
+public final class ModifyUserServiceValidator extends BaseUserDataValidator implements IModifyUserServiceValidator {
 
     /**
      * Constructor with dependency injection.

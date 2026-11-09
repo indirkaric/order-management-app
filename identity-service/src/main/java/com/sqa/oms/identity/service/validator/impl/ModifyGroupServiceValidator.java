@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * Default implementation of the group update validation.
  */
 @Service
-public class ModifyGroupServiceValidator extends BaseGroupDataValidator
+public final class ModifyGroupServiceValidator extends BaseGroupDataValidator
         implements IModifyGroupServiceValidator {
 
     /**

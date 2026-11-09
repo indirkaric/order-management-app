@@ -55,6 +55,13 @@ public class ProductDocumentService implements IProductDocumentService {
         this.productMapper = productMapper;
     }
 
+    /**
+     * Reads the metadata of a single product document.
+     *
+     * @param productEntityId  entityId of the owning product
+     * @param documentEntityId entityId of the document
+     * @return the document metadata
+     */
     @Override
     public ProductDocumentDTO getByEntityId(final String productEntityId, final String documentEntityId) {
         Check.isNotEmpty(productEntityId, "productEntityId");
@@ -65,6 +72,12 @@ public class ProductDocumentService implements IProductDocumentService {
         return productMapper.toDto(loadDocument(documentEntityId, product));
     }
 
+    /**
+     * Lists the metadata of every document attached to a product.
+     *
+     * @param productEntityId entityId of the owning product
+     * @return the product's documents
+     */
     @Override
     public List<ProductDocumentDTO> listByProductEntityId(final String productEntityId) {
         Check.isNotEmpty(productEntityId, "productEntityId");
@@ -77,6 +90,13 @@ public class ProductDocumentService implements IProductDocumentService {
                 .toList();
     }
 
+    /**
+     * Downloads the binary content of a product document.
+     *
+     * @param productEntityId  entityId of the owning product
+     * @param documentEntityId entityId of the document
+     * @return the document content together with its metadata
+     */
     @Override
     public ProductDocumentContent download(final String productEntityId, final String documentEntityId) {
         Check.isNotEmpty(productEntityId, "productEntityId");

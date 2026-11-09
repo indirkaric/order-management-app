@@ -89,6 +89,12 @@ public class CreateGroupService implements ICreateGroupService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Creates a group from the given request.
+     *
+     * @param request the group to create
+     * @return entityId of the created group
+     */
     @Override
     public String save(final CreateGroupRequest request) {
         Check.isNotNull(request, "request");

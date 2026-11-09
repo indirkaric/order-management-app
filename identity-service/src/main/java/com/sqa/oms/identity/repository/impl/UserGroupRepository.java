@@ -19,7 +19,7 @@ import java.util.List;
  * Criteria API based access to the user_group join table.
  */
 @Repository
-public class UserGroupRepository implements IUserGroupRepository {
+public final class UserGroupRepository implements IUserGroupRepository {
 
     // Constructor injection: EntityManager is still a container-managed persistence context proxy,
     // but it is a regular injectable bean for this service's single persistence unit, so it is wired

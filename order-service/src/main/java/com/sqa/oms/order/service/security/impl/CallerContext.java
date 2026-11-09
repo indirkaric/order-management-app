@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class CallerContext implements ICallerContext {
+public final class CallerContext implements ICallerContext {
 
     @Override
     public String getUserId() {

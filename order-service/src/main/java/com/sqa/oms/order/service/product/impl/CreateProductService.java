@@ -60,6 +60,12 @@ public class CreateProductService implements ICreateProductService {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
+    /**
+     * Creates a product from the given request.
+     *
+     * @param request the product to create
+     * @return entityId of the created product
+     */
     @Override
     public String save(final CreateProductRequest request) {
         Check.isNotNull(request, "request");

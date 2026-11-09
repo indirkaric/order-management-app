@@ -15,7 +15,7 @@ import java.util.Optional;
  * Default implementation of the user create validation.
  */
 @Service
-public class CreateUserServiceValidator extends BaseUserDataValidator implements ICreateUserServiceValidator {
+public final class CreateUserServiceValidator extends BaseUserDataValidator implements ICreateUserServiceValidator {
 
     /**
      * Constructor with dependency injection.

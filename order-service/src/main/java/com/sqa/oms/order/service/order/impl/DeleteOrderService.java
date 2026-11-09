@@ -56,6 +56,11 @@ public class DeleteOrderService implements IDeleteOrderService {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
+    /**
+     * Deletes an order.
+     *
+     * @param entityId entityId of the order to delete
+     */
     @Override
     public void delete(final String entityId) {
         Check.isNotEmpty(entityId, "entityId");

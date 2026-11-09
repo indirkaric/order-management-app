@@ -95,6 +95,12 @@ public class ModifyGroupService implements IModifyGroupService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Updates an existing group and its permission assignments.
+     *
+     * @param entityId entityId of the group to update
+     * @param request  the new group content
+     */
     @Override
     public void update(final String entityId, final UpdateGroupRequest request) {
         Check.isNotEmpty(entityId, "entityId");

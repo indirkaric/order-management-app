@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Default implementation of the product document create validation.
  */
 @Service
-public class CreateProductDocumentServiceValidator implements ICreateProductDocumentServiceValidator {
+public final class CreateProductDocumentServiceValidator implements ICreateProductDocumentServiceValidator {
 
     @Override
     public void validate(final MultipartFile file) {

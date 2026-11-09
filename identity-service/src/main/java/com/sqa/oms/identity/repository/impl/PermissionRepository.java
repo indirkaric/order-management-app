@@ -34,7 +34,7 @@ import java.util.Optional;
  * Criteria API based access to the permission table.
  */
 @Repository
-public class PermissionRepository implements IPermissionRepository {
+public final class PermissionRepository implements IPermissionRepository {
 
     // Constructor injection: EntityManager is still a container-managed persistence context proxy,
     // but it is a regular injectable bean for this service's single persistence unit, so it is wired

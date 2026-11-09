@@ -77,6 +77,12 @@ public class ModifyOrderService implements IModifyOrderService {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
+    /**
+     * Updates the items and details of an existing order.
+     *
+     * @param entityId entityId of the order to update
+     * @param request  the new order content
+     */
     @Override
     public void update(final String entityId, final UpdateOrderRequest request) {
         Check.isNotEmpty(entityId, "entityId");
@@ -91,6 +97,12 @@ public class ModifyOrderService implements IModifyOrderService {
         raiseEvent(saved);
     }
 
+    /**
+     * Moves an order to a new status.
+     *
+     * @param entityId entityId of the order to transition
+     * @param request  the requested target status
+     */
     @Override
     public void updateStatus(final String entityId, final UpdateOrderStatusRequest request) {
         Check.isNotEmpty(entityId, "entityId");

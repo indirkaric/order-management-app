@@ -45,6 +45,12 @@ public class GroupService implements IGroupService {
         this.groupMapper = groupMapper;
     }
 
+    /**
+     * Reads a single group by its entityId.
+     *
+     * @param entityId entityId of the group
+     * @return the group
+     */
     @Override
     public GroupDTO getByEntityId(final String entityId) {
         Check.isNotEmpty(entityId, "entityId");
@@ -58,6 +64,13 @@ public class GroupService implements IGroupService {
         return groupMapper.toDto(projection);
     }
 
+    /**
+     * Reads a page of groups matching the given filter.
+     *
+     * @param request  filter criteria
+     * @param pageable paging and sorting
+     * @return the matching page of groups
+     */
     @Override
     public PagedList<GroupDTO> getPagedList(final GroupListRequest request, final Pageable pageable) {
         Check.isNotNull(request, "request");

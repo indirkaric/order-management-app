@@ -18,7 +18,7 @@ import java.util.List;
  * Default implementation of the permission list response builder.
  */
 @Service
-public class PermissionListResponseCreatorService implements IPermissionListResponseCreatorService {
+public final class PermissionListResponseCreatorService implements IPermissionListResponseCreatorService {
 
     private final IPermissionService permissionService;
 

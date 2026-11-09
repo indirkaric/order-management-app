@@ -20,7 +20,7 @@ import java.util.List;
  * Default implementation of the order list response builder.
  */
 @Service
-public class OrderListResponseCreatorService implements IOrderListResponseCreatorService {
+public final class OrderListResponseCreatorService implements IOrderListResponseCreatorService {
 
     private final IOrderService orderService;
 

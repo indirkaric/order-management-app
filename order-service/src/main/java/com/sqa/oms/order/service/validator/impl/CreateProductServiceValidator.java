@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  * Default implementation of the product create validation.
  */
 @Service
-public class CreateProductServiceValidator implements ICreateProductServiceValidator {
+public final class CreateProductServiceValidator implements ICreateProductServiceValidator {
 
     private final IProductRepository productRepository;
 

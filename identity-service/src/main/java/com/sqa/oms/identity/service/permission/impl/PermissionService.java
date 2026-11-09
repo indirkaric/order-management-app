@@ -46,6 +46,12 @@ public class PermissionService implements IPermissionService {
         this.permissionMapper = permissionMapper;
     }
 
+    /**
+     * Reads a single permission by its entityId.
+     *
+     * @param entityId entityId of the permission
+     * @return the permission
+     */
     @Override
     public PermissionDTO getByEntityId(final String entityId) {
         Check.isNotEmpty(entityId, "entityId");
@@ -59,6 +65,13 @@ public class PermissionService implements IPermissionService {
         return permissionMapper.toDto(projection);
     }
 
+    /**
+     * Reads a page of permissions matching the given filter.
+     *
+     * @param request  filter criteria
+     * @param pageable paging and sorting
+     * @return the matching page of permissions
+     */
     @Override
     public PagedList<PermissionDTO> getPagedList(final PermissionListRequest request, final Pageable pageable) {
         Check.isNotNull(request, "request");

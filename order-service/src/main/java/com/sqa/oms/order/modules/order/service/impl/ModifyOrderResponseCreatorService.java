@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * Default implementation of the update order and update order status response builder.
  */
 @Service
-public class ModifyOrderResponseCreatorService implements IModifyOrderResponseCreatorService {
+public final class ModifyOrderResponseCreatorService implements IModifyOrderResponseCreatorService {
 
     private final IModifyOrderService modifyOrderService;
 

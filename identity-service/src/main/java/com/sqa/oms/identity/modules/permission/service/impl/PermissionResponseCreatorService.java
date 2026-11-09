@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  * Default implementation of the single permission response builder.
  */
 @Service
-public class PermissionResponseCreatorService implements IPermissionResponseCreatorService {
+public final class PermissionResponseCreatorService implements IPermissionResponseCreatorService {
 
     private final IPermissionService permissionService;
 
