@@ -41,6 +41,12 @@ public class ProductService implements IProductService {
         this.productMapper = productMapper;
     }
 
+    /**
+     * Reads a single product by its entityId.
+     *
+     * @param entityId entityId of the product
+     * @return the product
+     */
     @Override
     public ProductDTO getByEntityId(final String entityId) {
         Check.isNotEmpty(entityId, "entityId");
@@ -50,6 +56,13 @@ public class ProductService implements IProductService {
                 .orElseThrow(() -> new EntityNotFoundException("Product " + entityId + " was not found."));
     }
 
+    /**
+     * Reads a page of products matching the given filter.
+     *
+     * @param request  filter criteria
+     * @param pageable paging and sorting
+     * @return the matching page of products
+     */
     @Override
     public PagedList<ProductDTO> getPagedList(final ProductListRequest request, final Pageable pageable) {
         Check.isNotNull(request, "request");

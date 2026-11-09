@@ -95,6 +95,12 @@ public class ModifyUserService implements IModifyUserService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Updates an existing user and its group assignments.
+     *
+     * @param entityId entityId of the user to update
+     * @param request  the new user content
+     */
     @Override
     public void update(final String entityId, final ModifyUserRequest request) {
         Check.isNotEmpty(entityId, "entityId");

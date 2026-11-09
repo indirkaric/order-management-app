@@ -20,7 +20,7 @@ import java.util.List;
  * Default implementation of the group list response builder.
  */
 @Service
-public class GroupListResponseCreatorService implements IGroupListResponseCreatorService {
+public final class GroupListResponseCreatorService implements IGroupListResponseCreatorService {
 
     private final IGroupService groupService;
 

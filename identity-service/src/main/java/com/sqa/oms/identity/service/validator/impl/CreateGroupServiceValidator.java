@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * Default implementation of the group create validation.
  */
 @Service
-public class CreateGroupServiceValidator extends BaseGroupDataValidator
+public final class CreateGroupServiceValidator extends BaseGroupDataValidator
         implements ICreateGroupServiceValidator {
 
     /**

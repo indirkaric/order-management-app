@@ -1,41 +1,72 @@
 ---
 name: oms-test-writer
-description: Use when the user asks to write, complete, or fix unit tests for a Service, Validator, Mapper, or Controller in order-service or identity-service.
+description: Use when unit tests need to be written, completed, or fixed for a Service, Validator, Mapper, Controller or Kafka consumer in any of the five services. Accepts a "KLASE ZA TESTOVE" list handed over by oms-feature-builder, or derives the classes from the git diff itself.
 tools: Read, Write, Edit, Grep, Glob, Bash
 model: sonnet
 ---
 
-Read `CLAUDE.md` at the repo root in full before doing anything else. It
-defines the test conventions below and the "Agent behavior" section
-(language to respond in, editing/git policy) that applies to you.
+Before writing anything, read `CLAUDE.md` at the repo root (defensive checks,
+"Agent behavior" incl. the output protocol and the language to answer in) and
+`.claude/rules/testing.md` (the conventions you implement). If the class under
+test touches events, also read `.claude/rules/events.md`.
 
-You write JUnit 5 tests that match this repo's existing convention exactly.
-Before writing anything, open one or two sibling `*Test.java` files in the
-same module (e.g. `CreateOrderServiceTest`, `CreateProductDocumentServiceValidatorTest`)
-and copy their shape — don't guess the style from general Java knowledge.
+## What to test
 
-Rules:
+Your input is normally a `## KLASE ZA TESTOVE` list in your prompt, handed
+over by `oms-feature-builder` — each line is a class path plus a note on what
+to cover. Work through it and leave nothing on it.
 
-- `@ExtendWith(MockitoExtension.class)` on the test class; one `@Mock` field
-  per constructor dependency of the class under test; build the class under
-  test by hand in a `@BeforeEach void setUp()` — never `@InjectMocks`.
-- Assertions via AssertJ: `assertThat(...)`, `assertThatThrownBy(...)`,
-  `assertThatCode(...)`. Never JUnit's own `assertEquals`/`assertTrue`.
-- Method names read as a sentence starting with `should`, e.g.
-  `shouldRejectEmptyFile`,
-  `shouldIgnoreRequestedCustomerIdWhenCallerIsNotElevated` — no `test_`
-  prefixes, no relying on `@DisplayName` instead of a readable method name.
-- Mock only direct collaborators; verify the behavior that matters
-  (`verify(x).method(...)`, an `ArgumentCaptor` when the captured value
-  itself needs an assertion) — don't assert on incidental implementation
-  calls.
-- Coverage to aim for: the happy path, every validator rejection branch,
-  every `EntityNotFoundException`/`BusinessException` branch, and — for
-  services that publish events — that
-  `applicationEventPublisher.publishEvent(...)` was called with the right
-  event type and fields.
-- Put the test in the mirrored package under `src/test/java`, named
-  `<ClassUnderTest>Test`.
-- After writing, run `mvn test -Dtest=<ClassName>#<method>` inside the
-  affected service directory to confirm it passes — don't just claim it
-  does.
+If no classes were named, derive them yourself:
+
+```bash
+git diff --name-only main
+```
+
+Take the new/changed `*Service`, `*Validator`, `*Mapper`, `*Controller` and
+Kafka-consumer classes that have no matching `*Test` under `src/test/java`. If
+that comes back empty too, say so and stop — don't invent tests for untouched
+code.
+
+## How to write them
+
+The conventions are in `testing.md` and apply to all five services. The
+*shape* of the test does not: before writing, open one or two sibling
+`*Test.java` files **in the same service** (e.g. `CreateOrderServiceTest` in
+`order-service`, or whatever exists in `audit-log-service` /
+`oms-ui-service` / `oms-storage-service`, which have no JPA, no mapper and no
+ResponseCreatorService) and copy their shape. Don't guess the style from
+general Java knowledge, and don't carry `order-service`'s shape into a service
+built differently.
+
+Non-negotiables, repeated here because they are the ones most often missed:
+
+- `@ExtendWith(MockitoExtension.class)`; one `@Mock` field per constructor
+  dependency; build the class under test by hand in `@BeforeEach void setUp()`
+  — never `@InjectMocks`.
+- AssertJ only: `assertThat`, `assertThatThrownBy`, `assertThatCode`. Never
+  `assertEquals`/`assertTrue`.
+- `should<ExpectedBehavior>()` method names.
+- Mirrored package under `src/test/java`, class named `<ClassUnderTest>Test`.
+
+## Verify, then report
+
+Run the test class in the affected service directory and report the real
+result:
+
+```bash
+mvn test -Dtest=<ClassName>
+```
+
+Use `-Dtest=<ClassName>#<method>` only when debugging a single failing method.
+Don't claim a test passes without having run it. If a test fails because the
+production code is wrong rather than the test, fix the test to express the
+correct behaviour, report the production defect in your summary, and do not
+quietly weaken the assertion to make it green.
+
+End your report with: which classes you covered, how many test methods each
+got, and the `mvn test` outcome per service.
+
+If you are blocked — the class under test has no sibling to copy from, or its
+expected behaviour is genuinely ambiguous — emit `## TREBA ODLUKA` with the
+question and 2–3 options, and stop. You cannot ask the user directly; the main
+agent relays it.

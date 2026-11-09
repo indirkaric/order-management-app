@@ -78,6 +78,13 @@ public class CreateProductDocumentService implements ICreateProductDocumentServi
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
+    /**
+     * Uploads a document and attaches it to the given product.
+     *
+     * @param productEntityId entityId of the product the document belongs to
+     * @param file            the uploaded file
+     * @return entityId of the stored document
+     */
     @Override
     public String upload(final String productEntityId, final MultipartFile file) {
         Check.isNotEmpty(productEntityId, "productEntityId");

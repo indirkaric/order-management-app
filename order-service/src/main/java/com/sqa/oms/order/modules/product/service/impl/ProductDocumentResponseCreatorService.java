@@ -15,7 +15,7 @@ import java.util.List;
  * Default implementation of the single and list product document response builder.
  */
 @Service
-public class ProductDocumentResponseCreatorService implements IProductDocumentResponseCreatorService {
+public final class ProductDocumentResponseCreatorService implements IProductDocumentResponseCreatorService {
 
     private final IProductDocumentService productDocumentService;
 

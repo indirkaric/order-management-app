@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * Default implementation of the create product response builder.
  */
 @Service
-public class CreateProductResponseCreatorService implements ICreateProductResponseCreatorService {
+public final class CreateProductResponseCreatorService implements ICreateProductResponseCreatorService {
 
     private final ICreateProductService createProductService;
 

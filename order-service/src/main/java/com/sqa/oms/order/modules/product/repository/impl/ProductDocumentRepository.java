@@ -19,7 +19,7 @@ import java.util.Optional;
  * Criteria API based access to the product_document table.
  */
 @Repository
-public class ProductDocumentRepository implements IProductDocumentRepository {
+public final class ProductDocumentRepository implements IProductDocumentRepository {
 
     // Field injection: EntityManager is a container-managed persistence context proxy,
     // not a plain singleton bean, so it is wired through @PersistenceContext rather than the constructor.

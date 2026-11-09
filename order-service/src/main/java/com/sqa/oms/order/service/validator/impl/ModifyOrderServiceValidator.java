@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * Default implementation of the order update validation.
  */
 @Service
-public class ModifyOrderServiceValidator extends BaseOrderDataValidator
+public final class ModifyOrderServiceValidator extends BaseOrderDataValidator
         implements IModifyOrderServiceValidator {
 
     @Override

@@ -16,7 +16,7 @@ import java.util.List;
  * Default implementation of the single order response builder.
  */
 @Service
-public class OrderResponseCreatorService implements IOrderResponseCreatorService {
+public final class OrderResponseCreatorService implements IOrderResponseCreatorService {
 
     private final IOrderService orderService;
 

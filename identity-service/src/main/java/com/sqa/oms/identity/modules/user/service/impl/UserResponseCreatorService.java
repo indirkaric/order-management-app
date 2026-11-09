@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
  * Default implementation of the single user response builder.
  */
 @Service
-public class UserResponseCreatorService implements IUserResponseCreatorService {
+public final class UserResponseCreatorService implements IUserResponseCreatorService {
 
     private final IUserService userService;
 

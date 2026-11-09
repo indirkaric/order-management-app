@@ -19,7 +19,7 @@ import java.util.List;
  * Criteria API based access to the group_permission join table.
  */
 @Repository
-public class GroupPermissionRepository implements IGroupPermissionRepository {
+public final class GroupPermissionRepository implements IGroupPermissionRepository {
 
     // Constructor injection: EntityManager is still a container-managed persistence context proxy,
     // but it is a regular injectable bean for this service's single persistence unit, so it is wired

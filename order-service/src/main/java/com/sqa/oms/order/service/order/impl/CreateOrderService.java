@@ -80,6 +80,12 @@ public class CreateOrderService implements ICreateOrderService {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
+    /**
+     * Creates an order from the given request.
+     *
+     * @param request the order to create
+     * @return entityId of the created order
+     */
     @Override
     public String save(final CreateOrderRequest request) {
         Check.isNotNull(request, "request");

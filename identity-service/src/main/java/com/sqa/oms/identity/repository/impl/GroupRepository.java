@@ -35,7 +35,7 @@ import java.util.Optional;
  * Criteria API based access to the group table.
  */
 @Repository
-public class GroupRepository implements IGroupRepository {
+public final class GroupRepository implements IGroupRepository {
 
     // Constructor injection: EntityManager is still a container-managed persistence context proxy,
     // but it is a regular injectable bean for this service's single persistence unit, so it is wired

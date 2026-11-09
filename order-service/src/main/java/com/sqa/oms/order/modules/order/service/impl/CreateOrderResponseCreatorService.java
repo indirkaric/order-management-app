@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * Default implementation of the create order response builder.
  */
 @Service
-public class CreateOrderResponseCreatorService implements ICreateOrderResponseCreatorService {
+public final class CreateOrderResponseCreatorService implements ICreateOrderResponseCreatorService {
 
     private final ICreateOrderService createOrderService;
 

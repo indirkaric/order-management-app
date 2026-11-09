@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
  * Default implementation of the order create validation.
  */
 @Service
-public class CreateOrderServiceValidator extends BaseOrderDataValidator
+public final class CreateOrderServiceValidator extends BaseOrderDataValidator
         implements ICreateOrderServiceValidator {
 
     @Override

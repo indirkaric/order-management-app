@@ -52,6 +52,12 @@ public class OrderService implements IOrderService {
         this.callerContext = callerContext;
     }
 
+    /**
+     * Reads a single order visible to the current caller.
+     *
+     * @param entityId entityId of the order
+     * @return the order
+     */
     @Override
     public OrderDTO getByEntityId(final String entityId) {
         Check.isNotEmpty(entityId, "entityId");
@@ -59,6 +65,13 @@ public class OrderService implements IOrderService {
         return orderMapper.toDto(loadVisibleOrderProjection(entityId));
     }
 
+    /**
+     * Reads a page of orders visible to the current caller.
+     *
+     * @param status   optional status filter
+     * @param pageable paging and sorting
+     * @return the matching page of orders
+     */
     @Override
     public PagedList<OrderDTO> getPagedList(final OrderStatus status, final Pageable pageable) {
         Check.isNotNull(pageable, "pageable");

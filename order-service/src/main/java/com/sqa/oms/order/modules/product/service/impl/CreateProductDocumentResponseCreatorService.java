@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Default implementation of the upload product document response builder.
  */
 @Service
-public class CreateProductDocumentResponseCreatorService
+public final class CreateProductDocumentResponseCreatorService
         implements ICreateProductDocumentResponseCreatorService {
 
     private final ICreateProductDocumentService createProductDocumentService;

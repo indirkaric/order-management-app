@@ -21,7 +21,7 @@ import java.util.List;
  * Default implementation of the user list response builder.
  */
 @Service
-public class UserListResponseCreatorService implements IUserListResponseCreatorService {
+public final class UserListResponseCreatorService implements IUserListResponseCreatorService {
 
     private final IUserService userService;
 

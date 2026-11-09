@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  * Default implementation of the group create response builder.
  */
 @Service
-public class CreateGroupResponseCreatorService implements ICreateGroupResponseCreatorService {
+public final class CreateGroupResponseCreatorService implements ICreateGroupResponseCreatorService {
 
     private final ICreateGroupService createGroupService;
 
