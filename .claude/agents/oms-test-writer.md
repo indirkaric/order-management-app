@@ -50,21 +50,31 @@ Non-negotiables, repeated here because they are the ones most often missed:
 
 ## Verify, then report
 
-Run the test class in the affected service directory and report the real
-result:
+Run the tests in the affected service directory and report the real result.
+Verify **all** of the classes you wrote in **one** batched invocation per
+service, never one per class:
 
 ```bash
-mvn test -Dtest=<ClassName>
+mvn -o -q test -Dtest=CreateOrderServiceTest,CreateOrderServiceValidatorTest -DfailIfNoTests=false
 ```
 
-Use `-Dtest=<ClassName>#<method>` only when debugging a single failing method.
+Each `mvn` call is a fresh JVM, a fresh dependency resolution and a fresh
+compile of the whole service — three test classes verified separately cost
+roughly three times one batched run, and that heat is paid on the user's
+laptop. `-o` (offline) skips the remote metadata lookups; drop it only if the
+run fails with a genuine resolution error, and say so. Use
+`-Dtest=<ClassName>#<method>` only when drilling into one already-failing
+method.
+
 Don't claim a test passes without having run it. If a test fails because the
 production code is wrong rather than the test, fix the test to express the
 correct behaviour, report the production defect in your summary, and do not
 quietly weaken the assertion to make it green.
 
 End your report with: which classes you covered, how many test methods each
-got, and the `mvn test` outcome per service.
+got, and the outcome of your batched test run per service. Label it as exactly
+that — it verifies the tests you just wrote, it is **not** the ship gate.
+`/ship` Step 5 is the authoritative checkstyle/test gate and runs after you.
 
 If you are blocked — the class under test has no sibling to copy from, or its
 expected behaviour is genuinely ambiguous — emit `## TREBA ODLUKA` with the

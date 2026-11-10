@@ -33,13 +33,20 @@ with the right event type and fields (see [events.md](events.md)).
 ## Running them
 
 ```bash
-mvn test                      # whole service
-mvn test -Dtest=ClassName     # one test class
-mvn test -Dtest=ClassName#method   # one test method, for debugging
+mvn -o -q test                                     # whole service
+mvn -o -q test -Dtest=A,B,C -DfailIfNoTests=false  # several classes, ONE run
+mvn -o -q test -Dtest=ClassName#method             # one method, for debugging
 ```
 
 Always from inside the affected service's directory — there is no aggregator
-build at the repo root.
+build at the repo root, and never across services the change didn't touch.
+
+`-o` (offline) skips the remote metadata lookup on every dependency; drop it
+only if a run fails with a genuine resolution error. Verifying several classes
+in one invocation matters: each `mvn` call is a fresh JVM, a fresh dependency
+resolution and a fresh compile of the whole service, so a call per class
+multiplies the cost for no extra signal. `/ship` Step 5 combines even further,
+into one `mvn -o -q checkstyle:check test` per affected service.
 
 ## Who writes them (ownership)
 

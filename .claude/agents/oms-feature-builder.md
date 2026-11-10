@@ -67,8 +67,11 @@ Verify, concretely:
   packages — only `model`/`dto` and `*ResponseCreatorService`.
 - You reused the existing event listener/`IDomainEventPublisher` wiring
   instead of duplicating it.
-- `mvn checkstyle:check` passes in the affected service (run it — no wildcard
-  or unused imports, Javadoc on public API).
+- No wildcard imports, no unused imports, Javadoc on every public API member —
+  checked by reading your own output, **not** by running `mvn`. Do not run
+  Maven at all: `/ship` Step 5 runs `mvn -o -q checkstyle:check test` once,
+  scoped to the affected services, and a build here would just double that
+  cost on the user's machine for a result that gets recomputed minutes later.
 - You did not run `git commit` or `git push`.
 
 ## Tests: hand them off, don't write them
