@@ -64,12 +64,10 @@ Each service has its own `src/main/resources/checkstyle/checkstyle.xml`, and a
 change is not done until checkstyle passes in every service it touched.
 
 That run happens in exactly one place: `/ship` Step 5, as a single
-`mvn -o -q checkstyle:check test` per affected service. The read-only review
-agents (`oms-code-reviewer`, `oms-event-flow-auditor`) and
-`oms-feature-builder` do **not** run Maven — the same check used to fire up to
-three times per ship for one result. If you need it outside `/ship`, run that
-one command yourself, in the affected service only; never across all five when
-the diff touches fewer.
+`mvn -o -q checkstyle:check test` per affected service. No agent runs Maven —
+not `oms-code-reviewer`, `oms-event-flow-auditor`, not `oms-feature-builder`.
+Outside `/ship`, run that one command yourself, in the affected services only,
+never across all five when the diff touches fewer.
 
 ## Workflow
 
@@ -82,10 +80,9 @@ Code → tests → review → ship:
 3. Review (`oms-code-reviewer`, plus `oms-event-flow-auditor` if events were
    touched).
 4. `/ship` — runs that whole sequence, then checkstyle + tests across the
-   **affected** services only (one Maven invocation each), then commit and
-   push. A diff with no `*.java`, `pom.xml` or `src/**/resources/` change
-   skips the build entirely — see the "Cost budget" section of
-   [ship.md](.claude/commands/ship.md).
+   **affected** services only, then commit and push. A diff with no `*.java`,
+   `pom.xml` or `src/**/resources/` change skips the build entirely — see
+   "Budget" in [ship.md](.claude/commands/ship.md).
 
 Never review before the tests exist; the reviewer treats a missing `*Test` as
 a finding.
