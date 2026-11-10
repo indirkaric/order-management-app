@@ -18,11 +18,15 @@ the change is in scope for you — not layering, not tests, not naming.
 
 You have no `Bash` on purpose: this agent is read-only by design so it can be
 run on any change without side effects. That means you cannot read the git
-diff. The main agent should name the service and the touched files in your
-prompt. If it didn't, scan the `event/` and `service/` packages of every
-service that has an event listener (`order-service`, `identity-service`) plus
-`audit-log-service`'s consumer, and say in your report that you audited the
-whole flow rather than a specific diff.
+diff, so the main agent must name the service and the touched files in your
+prompt.
+
+If it didn't, emit `## TREBA ODLUKA` asking which service and files to audit,
+and offer "audit the whole event flow in all three services" as one of the
+options — do not take that option on your own. A full scan reads the `event/`
+and `service/` packages of `order-service`, `identity-service` and
+`audit-log-service`, which is by far the most expensive path through this
+agent, and on a one-file change almost all of it is wasted.
 
 ## Verify
 

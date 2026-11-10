@@ -60,9 +60,16 @@ does.
 
 ## Checkstyle
 
-Each service has its own `src/main/resources/checkstyle/checkstyle.xml` —
-run `mvn checkstyle:check` inside that service before considering a change
-done.
+Each service has its own `src/main/resources/checkstyle/checkstyle.xml`, and a
+change is not done until checkstyle passes in every service it touched.
+
+That run happens in exactly one place: `/ship` Step 5, as a single
+`mvn -o -q checkstyle:check test` per affected service. The read-only review
+agents (`oms-code-reviewer`, `oms-event-flow-auditor`) and
+`oms-feature-builder` do **not** run Maven — the same check used to fire up to
+three times per ship for one result. If you need it outside `/ship`, run that
+one command yourself, in the affected service only; never across all five when
+the diff touches fewer.
 
 ## Workflow
 
@@ -74,8 +81,11 @@ Code → tests → review → ship:
    [testing.md](.claude/rules/testing.md).
 3. Review (`oms-code-reviewer`, plus `oms-event-flow-auditor` if events were
    touched).
-4. `/ship` — runs that whole sequence, then checkstyle + tests across all 5
-   services, then commit and push.
+4. `/ship` — runs that whole sequence, then checkstyle + tests across the
+   **affected** services only (one Maven invocation each), then commit and
+   push. A diff with no `*.java`, `pom.xml` or `src/**/resources/` change
+   skips the build entirely — see the "Cost budget" section of
+   [ship.md](.claude/commands/ship.md).
 
 Never review before the tests exist; the reviewer treats a missing `*Test` as
 a finding.
@@ -130,6 +140,8 @@ review agent's report, so `/ship` has something to gate on.
 
 - `BLOCK` — a non-negotiable rule is broken: a missing `Check.*`, a layering
   violation, a Kafka/`IDomainEventPublisher` bypass, a `final` method on a
-  Controller, or a failing `mvn checkstyle:check` / `mvn test`.
+  Controller, or a failing `mvn checkstyle:check` / `mvn test`. The last of
+  those is `/ship` Step 5's finding, since it is the only step that runs the
+  build; a review agent never reports a build result it did not measure.
 - `WARNING` — style, Javadoc/OpenAPI gaps, a test worth adding.
 - `APPROVE` — no findings. Say so plainly; don't invent nits to pad the report.
