@@ -10,7 +10,8 @@ of their existing classes first — they are intentionally built differently
 and alternatives").
 
 Controller rules live in [controllers.md](controllers.md), validators in
-[validators.md](validators.md), the event bridge in [events.md](events.md).
+[validators.md](validators.md), the event bridge in [events.md](events.md),
+the pipeline and handoffs in [workflow.md](workflow.md).
 
 ## Package layout (per domain module, e.g. "order", "user", "product")
 
@@ -49,13 +50,41 @@ per service, reuse it)
 Rule of thumb: the Controller depends ONLY on `*ResponseCreatorService`
 interfaces (plus a bare operation service for operations with no response
 body, like delete). It never imports a `Repository`, an `Entity`, or a
-MapStruct mapper directly. See `OrderController` / `UserController` for the
-reference shape.
+MapStruct mapper directly `[BLOCK]`. See `OrderController` / `UserController`
+for the reference shape.
+
+## Build order
+
+The canonical order for a new domain module or a new write operation on an
+existing one. This is the **only** copy of this ordering in the repo — agents,
+skills and commands point here rather than restating it. Later steps depend on
+earlier ones existing, so don't reorder them.
+
+1. `entity/<Entity>.java` — if it doesn't exist yet.
+2. Liquibase changelog for the new table/columns, in that service's
+   `src/main/resources/liquibase/`. Never `ddl-auto: update` `[BLOCK]`.
+3. `repository/I<Domain>Repository` + `repository/impl/<Domain>Repository`,
+   plus a `repository/projection/` projection if the domain will have
+   list/detail reads.
+4. `service/validator/I<Verb><Domain>ServiceValidator` + impl — per
+   [validators.md](validators.md).
+5. `service/<domain>/I<Verb><Domain>Service` + impl — one interface per
+   operation. If the operation changes state, publish the local
+   `DomainChangeEvent` from here, inside the transaction, per
+   [events.md](events.md) — this is where the event belongs, not a later step.
+6. `mapper/I<Domain>Mapper` — extend the domain's existing mapper rather than
+   adding a second one.
+7. `modules/<domain>/model/` request/response records and `dto/` DTOs.
+8. `modules/<domain>/service/I<Verb><Domain>ResponseCreatorService` + impl.
+9. `<Domain>Controller` endpoint — per [controllers.md](controllers.md).
+10. Tests for every class added in steps 3–9, per [testing.md](testing.md).
+    Who writes them, and when relative to review, is in
+    [workflow.md](workflow.md).
 
 ## Service layer: split by operation, not by entity
 
-Do not write one `OrderService` with `create/update/delete/get` methods.
-Split into:
+Do not write one `OrderService` with `create/update/delete/get` methods
+`[BLOCK]`. Split into:
 
 - `ICreateXService` / `CreateXService` — write, returns the new entityId
 - `IModifyXService` / `ModifyXService` — update / status transitions
@@ -63,11 +92,11 @@ Split into:
 - `IXService` / `XService` — read-only queries, `@Transactional(readOnly = true)`
 
 Each is `@Service`, constructor injection only, every injected dependency
-validated with `Check.isNotNull(dep, "depName")` inside the constructor, and
-documented with a full `/** ... @param ... */` Javadoc block naming every
-parameter — on the constructor **and** on every public method. Write services
-are `@Transactional` at the class level; read services are
-`@Transactional(readOnly = true)`.
+validated with `Check.isNotNull(dep, "depName")` inside the constructor
+`[BLOCK]`, and documented with a full `/** ... @param ... */` Javadoc block
+naming every parameter — on the constructor **and** on every public method
+`[WARN]`. Write services are `@Transactional` at the class level; read services
+are `@Transactional(readOnly = true)`.
 
 ### `final` and Spring proxies
 
@@ -76,8 +105,8 @@ Make the class `final` only when Spring does not proxy it. Concretely:
 - `final` — repository impls, ResponseCreatorServices, validators,
   `CallerContext`: nothing proxies them, so `final` is correct and checkstyle's
   `DesignForExtension` is satisfied for free.
-- **not `final`** — any class carrying `@Transactional`. Spring Boot's
-  `TransactionAutoConfiguration` activates
+- **not `final`** — any class carrying `@Transactional` `[BLOCK]`. Spring
+  Boot's `TransactionAutoConfiguration` activates
   `@EnableTransactionManagement(proxyTargetClass = true)` whenever
   `spring.aop.proxy-target-class` is unset (`matchIfMissing = true`), so these
   beans are proxied with CGLIB *even though they implement an interface*, and
@@ -118,7 +147,7 @@ concerns.
 
 - One interface per domain: `@Mapper(componentModel = "spring",
   unmappedTargetPolicy = ReportingPolicy.IGNORE)`.
-- Every method has a short Javadoc (`@param`/`@return`).
+- Every method has a short Javadoc (`@param`/`@return`) `[WARN]`.
 - Derived/computed fields use `@Mapping(target = "...", expression =
   "java(...)")`, delegating to a small static helper (e.g.
   `OrderAmountCalculator`) — never duplicate the computation inline in both
@@ -135,7 +164,7 @@ concerns.
 - `dto/` = internal objects built off projections (`OrderDTO`), used only
   between the repository/mapper and the ResponseCreatorService. Never return
   a `dto` type from a Controller, and never return an `entity` from anywhere
-  above the repository.
+  above the repository `[BLOCK]`.
 
 ## Entities
 
@@ -144,4 +173,4 @@ concerns.
   {"<collectionFields>"})`, `@EntityListeners(BaseEntityListener.class)`,
   explicit `@Table(name = "...", schema = "...")`.
 - Schema changes go exclusively through Liquibase changelogs (per service's
-  `src/main/resources/liquibase/`) — never `ddl-auto: update`.
+  `src/main/resources/liquibase/`) — never `ddl-auto: update` `[BLOCK]`.

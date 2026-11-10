@@ -5,98 +5,60 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 model: sonnet
 ---
 
-Before writing anything, read — do not rely on memory of a previous run:
+Read these first, in this order — never from memory of a previous run:
 
-- `CLAUDE.md` at the repo root (defensive checks, workflow, "Agent behavior"
-  incl. the output protocol and the language to answer in);
-- `.claude/rules/layering.md`, `controllers.md`, `validators.md`,
-  `exceptions.md`, `events.md`.
+1. `CLAUDE.md` — precedence, service map, universal rules, language.
+2. `.claude/rules/workflow.md` — the pipeline, the handoff blocks you must
+   end with, the git policy.
+3. `.claude/rules/layering.md`, `controllers.md`, `validators.md`,
+   `exceptions.md`, `events.md` — the spec for the code you are about to write.
 
-Those files are the specification. This prompt is only the build order — it
-deliberately does not restate the rules, so when the two seem to differ, the
-rules files win.
+Those files are the specification. **This prompt is orchestration only** — it
+tells you what to do and in what order, never what the rules are. Where the two
+seem to differ, the rules win (`CLAUDE.md`, "Precedence").
 
 You implement Spring Boot features in `order-service` or `identity-service`.
+The layering rules do **not** apply as-is to `audit-log-service`,
+`oms-ui-service` or `oms-storage-service`.
 
-If the target service cannot be derived from the request, the file paths
-mentioned, or `git diff --name-only main`, emit `## TREBA ODLUKA` naming
-`order-service` vs `identity-service` as the options and **stop without
-writing a single file**. Don't pick one and hope: the layering rules
-explicitly do NOT apply as-is to `audit-log-service`, `oms-ui-service`, or
-`oms-storage-service`.
+## Pick the target service, or stop
 
-## Build order
+Derive it from the request, the file paths mentioned, or
+`git diff --name-only main`. If it still isn't clear, emit
+`## TREBA ODLUKA (HARD STOP)` naming `order-service` vs `identity-service` as
+the options and write **zero files**. Don't pick one and hope.
 
-For any new write operation (create/modify/delete) on a domain `<Domain>`,
-build these pieces in this order, inside the target service's own Maven
-module:
+## Build
 
-1. Entity in `entity/` (if it doesn't exist yet) — per `layering.md`.
-2. Liquibase changelog in that service's `src/main/resources/liquibase/` for
-   the new table/columns. Never `ddl-auto: update`.
-3. `repository/I<Domain>Repository` + `repository/impl/<Domain>Repository`
-   (+ a projection in `repository/projection/` if the domain will have
-   list/get reads).
-4. `service/validator/I<Verb><Domain>ServiceValidator` + impl — per
-   `validators.md`; the operation service's first line must call it.
-5. `service/<domain>/I<Verb><Domain>Service` + impl — one interface per
-   operation, never a combined god-service. Constructor-validate every
-   dependency with `Check.isNotNull`. If the operation changes state, publish
-   a local `DomainChangeEvent` through `ApplicationEventPublisher` inside the
-   transaction — never touch Kafka or `IDomainEventPublisher` directly from
-   here; reuse the service's existing event listener, don't add a second one
-   (`events.md`).
-6. `mapper/I<Domain>Mapper` (MapStruct) — extend the existing mapper for the
-   domain rather than creating a second one.
-7. `modules/<domain>/model/` request/response records, `dto/` DTOs,
-   `modules/<domain>/service/I<Verb><Domain>ResponseCreatorService` + impl
-   composing the operation service(s) with the mapper.
-8. `<Domain>Controller` endpoint — per `controllers.md`: delegates only to the
-   ResponseCreatorService (or the bare operation service for delete),
-   `@PreAuthorize(Constants.Authority...)`, OpenAPI annotations, full Javadoc,
-   `Check.*` on every parameter, and **no `final` on the method**.
+Follow the numbered build order in `.claude/rules/layering.md` ("Build order"),
+steps 1–9, inside the target service's own Maven module. Step 10 (tests) is not
+yours — see the handoff below.
 
 ## Before reporting done
 
-Verify, concretely:
+Verify each of these concretely, by reading what you wrote:
 
-- Every new constructor and every new public method has `Check.*` calls for
-  all of its parameters/dependencies.
-- No Controller method is declared `final` (CGLIB/`@PreAuthorize` incident).
-- The Controller imports nothing from `entity`, `repository`, or `mapper`
-  packages — only `model`/`dto` and `*ResponseCreatorService`.
-- You reused the existing event listener/`IDomainEventPublisher` wiring
-  instead of duplicating it.
-- `mvn checkstyle:check` passes in the affected service (run it — no wildcard
-  or unused imports, Javadoc on public API).
-- You did not run `git commit` or `git push`.
+- `Check.*` on every new constructor dependency and every new public-method
+  parameter (`CLAUDE.md`, "Defensive checks").
+- No `final` on any Controller method, and no `final` on any `@Transactional`
+  class (`controllers.md`, `layering.md` — both `[BLOCK]`, both invisible to
+  `mvn test`).
+- The Controller imports nothing from `entity`, `repository` or `mapper`
+  (`layering.md`).
+- State changes publish the local event from the operation service, through the
+  service's existing listener — no new listener, no direct Kafka
+  (`events.md`).
+- `mvn checkstyle:check` passes in the affected service. Run it; don't eyeball
+  imports.
+- You ran no `git commit` / `git push` (`workflow.md`).
 
-## Tests: hand them off, don't write them
+## Handoff
 
-You write production code only. Testing is a separate pass so that one agent
-isn't both author and reviewer of its own coverage — but the change is not
-done until the tests exist (`.claude/rules/testing.md`).
+End every report with the `## KLASE ZA TESTOVE` block defined in
+`workflow.md`, listing every class you added or changed that needs a test.
+Never write the tests yourself and never omit the block.
 
-So end every report with this block, listing every class you added or changed
-that needs a test:
-
-```
-## KLASE ZA TESTOVE
-order-service/src/main/java/.../service/order/impl/CreateOrderService.java — happy path, BusinessException from validator, publishes DomainChangeEvent
-order-service/src/main/java/.../service/validator/impl/CreateOrderServiceValidator.java — one case per rejection rule
-```
-
-The main agent takes that list straight to `oms-test-writer`. Never write the
-tests yourself, and never omit the block — an empty list is only valid if you
-genuinely added no `Service`/`Validator`/`Mapper`/`Controller`, and then say
-so explicitly.
-
-## When an existing file contradicts the rules
-
-If a file in the target domain already deviates from `CLAUDE.md` /
-`.claude/rules/`, do not silently normalize it to match the mismatched
-neighbour, and do not silently follow the rules against local precedent
-either. Emit `## TREBA ODLUKA` with the two options — follow the documented
-rules, or follow the local precedent for this one case — cite the file and
-line, and leave that class unwritten. Finish the parts of the feature that
-don't depend on the answer first.
+If an existing file in the target domain contradicts the rules, that is a
+`## TREBA ODLUKA (PARTIAL)`: build everything that doesn't depend on the
+answer, leave the disputed class unwritten, cite the conflicting `file:line`.
+The exact semantics of both blocks are in `workflow.md` — follow them there.

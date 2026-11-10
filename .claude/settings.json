@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(mvn checkstyle:check)",
+      "Bash(mvn test)",
+      "Bash(mvn test:*)",
+      "Bash(mvn jacoco:report)",
+      "Bash(mvn clean install)",
+      "Bash(mvn clean install:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch --show-current)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(wc:*)"
+    ],
+    "deny": [
+      "Read(./.mcp.json)",
+      "Read(./development/.env)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -fd:*)",
+      "Bash(docker compose down -v:*)",
+      "Bash(docker-compose down -v:*)",
+      "Bash(mvn deploy:*)"
+    ]
+  }
+}

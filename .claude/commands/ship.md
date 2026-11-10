@@ -8,8 +8,10 @@ Individual steps spawn focused agents.
 Arguments may add scope notes, but they never replace the branch preflight and
 never change which branch you are on.
 
-Read `CLAUDE.md` and `.claude/rules/testing.md` before Step 1. Answer the user
-in Bosnian throughout.
+Read `CLAUDE.md` (precedence, service table) and `.claude/rules/workflow.md`
+(pipeline, handoff blocks, verdict semantics) before Step 1. This command is
+the executable form of that pipeline — it sequences and gates, it does not
+redefine any of it. Answer the user in Bosnian throughout.
 
 At the start of each step output a progress line:
 `▶ <Step Name>...`
@@ -52,17 +54,17 @@ At the end of each step output:
 
 ## Step 3 — Tests Before Review
 
-1. From the changed-file list, find every new or changed `*Service`,
-   `*Validator`, `*Mapper`, `*Controller` or Kafka-consumer class with no
-   matching `*Test` under `src/test/java`.
-2. If that list is non-empty, launch **oms-test-writer** with it. If a previous
-   step produced a `## KLASE ZA TESTOVE` block, pass that through verbatim.
-3. This runs *before* the review on purpose: `oms-code-reviewer` counts a
-   missing `*Test` as a finding, so reviewing first would just report the
-   workflow's own design as a defect.
-4. If the agent returns `## TREBA ODLUKA`, relay it to the user with
-   `AskUserQuestion` and re-run it with the answer. Do not answer on the
-   user's behalf.
+1. Launch **oms-test-writer** with the changed-file list from Step 2. It
+   derives the untested classes itself — don't re-derive them here. If a
+   previous step produced a `## KLASE ZA TESTOVE` block, pass it through
+   verbatim as well.
+2. If it reports that nothing needs a test, continue.
+3. This runs *before* the review on purpose — the reason is in
+   `.claude/rules/workflow.md` ("Pipeline"). Don't reorder these two steps.
+4. If the agent returns a `## TREBA ODLUKA` block, relay it to the user with
+   `AskUserQuestion`, then **continue that same agent via `SendMessage`** with
+   the answer — do not spawn a fresh one, which would throw away the tests it
+   already wrote. Never answer on the user's behalf.
 
 ---
 
@@ -75,7 +77,8 @@ At the end of each step output:
    name the affected service and files in its prompt (it has no `Bash`, so it
    cannot read the diff itself).
 
-Then, on the `## VERDIKT` line of each report:
+Then gate on the `## VERDIKT` line of each report. The levels mean what
+`.claude/rules/workflow.md` says they mean; what this command does with each:
 
 - **`BLOCK`** — **[TREBA INPUT]** — stop, report every finding, ask how to
   proceed. Do NOT continue.
@@ -86,8 +89,8 @@ Then, on the `## VERDIKT` line of each report:
 - **No verdict line at all, or the agent failed to run** — **[TREBA INPUT]** —
   report that clearly and ask whether to stop or proceed without the review.
   Do NOT assume `APPROVE`.
-- Any `## TREBA ODLUKA` from either agent — relay it to the user, same as in
-  Step 3.
+- Any `## TREBA ODLUKA` from either agent — relay it to the user and continue
+  that agent with `SendMessage`, same as in Step 3.
 
 If you fix findings here, refresh the changed-file list before Step 5.
 
@@ -103,8 +106,9 @@ The final gate before committing. In **each of the five services**
 2. `mvn test`
 
 If either fails: fix it inline, then re-run that service. Never skip,
-`@Disabled`, or weaken a failing test to get green. Run `mvn jacoco:report`
-only if the user asked for coverage.
+`@Disabled`, or weaken a failing test to get green (`.claude/rules/testing.md`
+— that is `[BLOCK]`). Run `mvn jacoco:report` only if the user asked for
+coverage.
 
 Report the per-service outcome as a short list, not one blanket "all green".
 
@@ -150,6 +154,7 @@ the link and let them do it.
   infra.
 - Only this command may `git commit`/`git push` — invoking it is the user's
   explicit authorisation for those two actions, and for nothing else
-  (`CLAUDE.md`, "Agent behavior").
-- Follow `CLAUDE.md` and `.claude/rules/`.
+  (`.claude/rules/workflow.md`, "Git and infra in the pipeline").
+- Follow `CLAUDE.md` and `.claude/rules/`; where this file and a rule differ,
+  the rule wins (`CLAUDE.md`, "Precedence").
 - At any unexpected error, report clearly and stop.
